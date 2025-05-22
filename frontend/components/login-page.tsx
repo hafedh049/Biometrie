@@ -1,15 +1,17 @@
 "use client"
 
+import { CardFooter } from "@/components/ui/card"
+
 import type React from "react"
 import { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Fingerprint, Upload, ImageIcon } from "lucide-react"
+import { Fingerprint, Upload, ImageIcon, Mail, Lock, Eye, EyeOff, LogIn } from "lucide-react"
 import { useLanguage } from "@/components/language-provider"
 import ThemeToggle from "@/components/theme-toggle"
 import LanguageToggle from "@/components/language-toggle"
@@ -28,6 +30,7 @@ export default function LoginPage() {
   const [fingerprintScanning, setFingerprintScanning] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [showPassword, setShowPassword] = useState(false)
 
   // Only render the component after it's mounted on the client
   useEffect(() => {
@@ -158,7 +161,7 @@ export default function LoginPage() {
         transition={{ duration: 0.5 }}
         className="w-full max-w-md"
       >
-        <Card className="backdrop-blur-sm bg-background/80 border-primary/20 shadow-lg">
+        <Card className="backdrop-blur-sm bg-gradient-to-br from-background/90 via-background/80 to-background/70 border border-primary/30 shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-[0_8px_30px_rgba(var(--primary-rgb),0.1)] transition-all duration-300 rounded-xl overflow-hidden animate-in fade-in-50 slide-in-from-bottom-5">
           <CardHeader className="space-y-1">
             <CardTitle className="text-2xl font-bold text-center flex justify-center">
               <AnimatedAppName />
@@ -181,14 +184,18 @@ export default function LoginPage() {
                   <div className="space-y-4">
                     <div className="space-y-2">
                       <Label htmlFor="email">{t("email")}</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        placeholder="admin@example.com or client@example.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                      />
+                      <div className="relative">
+                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          id="email"
+                          type="email"
+                          placeholder="Enter your email address"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          className="pl-10"
+                          required
+                        />
+                      </div>
                     </div>
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
@@ -197,14 +204,25 @@ export default function LoginPage() {
                           {t("forgotPassword")}
                         </Button>
                       </div>
-                      <Input
-                        id="password"
-                        type="password"
-                        placeholder="admin123"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                      />
+                      <div className="relative">
+                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          id="password"
+                          type={showPassword ? "text" : "password"}
+                          placeholder="********"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          className="pl-10 pr-10"
+                          required
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary"
+                        >
+                          {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
+                      </div>
                     </div>
                     <Button type="submit" className="w-full" disabled={isLoading}>
                       {isLoading ? (
@@ -215,7 +233,10 @@ export default function LoginPage() {
                           <Fingerprint className="mr-2 h-4 w-4" />
                         </motion.div>
                       ) : (
-                        t("login")
+                        <>
+                          <LogIn className="mr-2 h-4 w-4" />
+                          {t("login")}
+                        </>
                       )}
                     </Button>
                   </div>
@@ -261,11 +282,7 @@ export default function LoginPage() {
             </Tabs>
           </CardContent>
           <CardFooter className="flex flex-col space-y-2">
-            <div className="text-xs text-center text-muted-foreground">
-              <p>Demo accounts:</p>
-              <p>Email: admin@example.com or client@example.com</p>
-              <p>Password: admin123</p>
-            </div>
+            {/* Footer content can be added here if needed */}
           </CardFooter>
         </Card>
       </motion.div>

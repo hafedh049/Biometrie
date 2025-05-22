@@ -63,6 +63,45 @@ export default function UsersPage() {
     role: "client",
   })
 
+  // Add these utility functions right after the component declaration
+  function obscureEmail(email: string): string {
+    if (!email) return ""
+    const [username, domain] = email.split("@")
+    if (!domain) return email
+
+    const visibleChars = Math.min(2, username.length)
+    const obscuredUsername =
+      username.substring(0, visibleChars) + "*".repeat(Math.max(1, username.length - visibleChars))
+
+    return `${obscuredUsername}@${domain}`
+  }
+
+  function obscurePhoneNumber(phone: string): string {
+    if (!phone) return ""
+
+    // Keep only the last 4 digits visible
+    const digits = phone.replace(/\D/g, "")
+    const nonDigits = [...phone].map((char) => (/\d/.test(char) ? null : char))
+
+    let result = ""
+    let digitIndex = 0
+
+    for (let i = 0; i < phone.length; i++) {
+      if (/\d/.test(phone[i])) {
+        if (digitIndex < digits.length - 4) {
+          result += "*"
+        } else {
+          result += phone[i]
+        }
+        digitIndex++
+      } else {
+        result += phone[i]
+      }
+    }
+
+    return result
+  }
+
   useEffect(() => {
     fetchUsers()
   }, [currentPage, statusFilter, fingerprintFilter])
@@ -487,8 +526,8 @@ export default function UsersPage() {
                 {filteredUsers.map((user) => (
                   <TableRow key={user._id}>
                     <TableCell className="font-medium uppercase">{user.username}</TableCell>
-                    <TableCell>{user.email}</TableCell>
-                    <TableCell>{user.phone_number}</TableCell>
+                    <TableCell title={user.email}>{obscureEmail(user.email)}</TableCell>
+                    <TableCell title={user.phone_number}>{obscurePhoneNumber(user.phone_number)}</TableCell>
                     <TableCell>
                       <span
                         className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium uppercase ${

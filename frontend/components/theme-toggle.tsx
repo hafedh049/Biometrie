@@ -17,7 +17,6 @@ export default function ThemeToggle() {
       // Check for stored preference first
       const savedTheme = localStorage.getItem("theme")
 
-      // If no saved preference, check system preference
       if (savedTheme) {
         // Set initial state based on saved preference
         const initialIsDark = savedTheme === "dark"
@@ -30,18 +29,10 @@ export default function ThemeToggle() {
           document.documentElement.classList.remove("dark")
         }
       } else {
-        // No saved preference, check system preference
-        const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches
-        setIsDarkMode(prefersDark)
-
-        // Apply the theme to the document and save it
-        if (prefersDark) {
-          document.documentElement.classList.add("dark")
-          localStorage.setItem("theme", "dark")
-        } else {
-          document.documentElement.classList.remove("dark")
-          localStorage.setItem("theme", "light")
-        }
+        // No saved preference, default to light theme
+        setIsDarkMode(false)
+        document.documentElement.classList.remove("dark")
+        localStorage.setItem("theme", "light")
       }
     }
 

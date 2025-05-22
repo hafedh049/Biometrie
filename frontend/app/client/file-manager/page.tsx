@@ -82,6 +82,9 @@ export default function ClientFileManagerPage() {
   const [isDownloading, setIsDownloading] = useState<string | null>(null)
   const [isDeleting, setIsDeleting] = useState<string | null>(null)
   const [viewFileData, setViewFileData] = useState<{ file: any; url: string | null }>({ file: null, url: null })
+  const [policiesAccepted, setPoliciesAccepted] = useState(false)
+  const [termsDialogOpen, setTermsDialogOpen] = useState(false)
+  const [privacyDialogOpen, setPrivacyDialogOpen] = useState(false)
 
   useEffect(() => {
     fetchDevices()
@@ -352,6 +355,15 @@ export default function ClientFileManagerPage() {
       toast({
         title: "Error",
         description: "Please select a device and partition first",
+        variant: "destructive",
+      })
+      return
+    }
+
+    if (!policiesAccepted) {
+      toast({
+        title: "Error",
+        description: "Please accept the Terms of Service and Privacy Policy",
         variant: "destructive",
       })
       return
@@ -939,10 +951,41 @@ export default function ClientFileManagerPage() {
                     </div>
                   </div>
 
+                  <div className="flex items-center space-x-2 py-2">
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        id="accept-policies"
+                        checked={policiesAccepted}
+                        onChange={(e) => setPoliciesAccepted(e.target.checked)}
+                        className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                      />
+
+                      <label htmlFor="accept-policies" className="text-sm text-muted-foreground">
+                        I accept the{" "}
+                        <button
+                          type="button"
+                          onClick={() => setTermsDialogOpen(true)}
+                          className="text-primary hover:underline font-medium"
+                        >
+                          Terms of Service
+                        </button>{" "}
+                        and{" "}
+                        <button
+                          type="button"
+                          onClick={() => setPrivacyDialogOpen(true)}
+                          className="text-primary hover:underline font-medium"
+                        >
+                          Privacy Policy
+                        </button>
+                      </label>
+                    </div>
+                  </div>
+
                   <div className="pt-4">
                     <Button
                       onClick={handleFileUpload}
-                      disabled={!selectedDevice || !selectedPartition || isUploading}
+                      disabled={!selectedDevice || !selectedPartition || isUploading || !policiesAccepted}
                       className="w-full md:w-auto"
                     >
                       {isUploading ? (
@@ -1640,6 +1683,144 @@ export default function ClientFileManagerPage() {
                 Download
               </Button>
             )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Terms of Service Dialog */}
+      <Dialog open={termsDialogOpen} onOpenChange={setTermsDialogOpen}>
+        <DialogContent className="sm:max-w-[600px] max-h-[80vh]">
+          <DialogHeader>
+            <DialogTitle>Terms of Service</DialogTitle>
+            <DialogDescription>Please read our Terms of Service carefully before using the platform.</DialogDescription>
+          </DialogHeader>
+          <div className="py-4 overflow-auto max-h-[50vh] pr-2">
+            <h3 className="text-lg font-semibold mb-2">1. Acceptance of Terms</h3>
+            <p className="mb-4 text-sm">
+              By accessing or using our secure file storage service, you agree to be bound by these Terms of Service and
+              all applicable laws and regulations. If you do not agree with any of these terms, you are prohibited from
+              using or accessing this service.
+            </p>
+
+            <h3 className="text-lg font-semibold mb-2">2. Use License</h3>
+            <p className="mb-4 text-sm">
+              Permission is granted to temporarily use our services for personal, non-commercial transitory viewing and
+              file storage only. This is the grant of a license, not a transfer of title.
+            </p>
+
+            <h3 className="text-lg font-semibold mb-2">3. Disclaimer</h3>
+            <p className="mb-4 text-sm">
+              The materials on our service are provided on an 'as is' basis. We make no warranties, expressed or
+              implied, and hereby disclaim and negate all other warranties including, without limitation, implied
+              warranties or conditions of merchantability, fitness for a particular purpose, or non-infringement of
+              intellectual property or other violation of rights.
+            </p>
+
+            <h3 className="text-lg font-semibold mb-2">4. Limitations</h3>
+            <p className="mb-4 text-sm">
+              In no event shall our company or its suppliers be liable for any damages (including, without limitation,
+              damages for loss of data or profit, or due to business interruption) arising out of the use or inability
+              to use our services.
+            </p>
+
+            <h3 className="text-lg font-semibold mb-2">5. Fingerprint Data</h3>
+            <p className="mb-4 text-sm">
+              By using our fingerprint authentication services, you consent to the collection, processing, and storage
+              of your biometric data for the sole purpose of securing your files. We implement industry-standard
+              security measures to protect this sensitive data.
+            </p>
+
+            <h3 className="text-lg font-semibold mb-2">6. Revisions and Errata</h3>
+            <p className="mb-4 text-sm">
+              The materials appearing on our service could include technical, typographical, or photographic errors. We
+              do not warrant that any of the materials on our service are accurate, complete, or current. We may make
+              changes to the materials contained on our service at any time without notice.
+            </p>
+
+            <h3 className="text-lg font-semibold mb-2">7. Governing Law</h3>
+            <p className="mb-4 text-sm">
+              These terms and conditions are governed by and construed in accordance with the laws and you irrevocably
+              submit to the exclusive jurisdiction of the courts in that location.
+            </p>
+          </div>
+          <DialogFooter>
+            <Button onClick={() => setTermsDialogOpen(false)}>Close</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Privacy Policy Dialog */}
+      <Dialog open={privacyDialogOpen} onOpenChange={setPrivacyDialogOpen}>
+        <DialogContent className="sm:max-w-[600px] max-h-[80vh]">
+          <DialogHeader>
+            <DialogTitle>Privacy Policy</DialogTitle>
+            <DialogDescription>Your privacy is important to us. Please review our privacy practices.</DialogDescription>
+          </DialogHeader>
+          <div className="py-4 overflow-auto max-h-[50vh] pr-2">
+            <h3 className="text-lg font-semibold mb-2">1. Information We Collect</h3>
+            <p className="mb-2 text-sm">
+              We collect several types of information from and about users of our service, including:
+            </p>
+            <ul className="list-disc pl-5 mb-4 space-y-1 text-sm">
+              <li>Personal information (such as name, email address, and contact details)</li>
+              <li>Biometric data (fingerprint hashes for authentication purposes)</li>
+              <li>Usage data (such as how you interact with our service)</li>
+              <li>Device information (such as IP address, browser type, and operating system)</li>
+            </ul>
+
+            <h3 className="text-lg font-semibold mb-2">2. How We Use Your Information</h3>
+            <p className="mb-2 text-sm">We use the information we collect about you to:</p>
+            <ul className="list-disc pl-5 mb-4 space-y-1 text-sm">
+              <li>Provide, maintain, and improve our services</li>
+              <li>Process and secure your file storage and encryption</li>
+              <li>Authenticate your identity through fingerprint verification</li>
+              <li>Communicate with you about service-related issues</li>
+              <li>Protect against unauthorized access to your data</li>
+            </ul>
+
+            <h3 className="text-lg font-semibold mb-2">3. Biometric Data Protection</h3>
+            <p className="mb-2 text-sm">Your fingerprint data is processed as follows:</p>
+            <ul className="list-disc pl-5 mb-4 space-y-1 text-sm">
+              <li>We never store actual fingerprint images</li>
+              <li>Only secure mathematical representations (hashes) are stored</li>
+              <li>Biometric data is encrypted using industry-standard protocols</li>
+              <li>Your fingerprint data is used solely for authentication purposes</li>
+              <li>You can delete your fingerprint data at any time through account settings</li>
+            </ul>
+
+            <h3 className="text-lg font-semibold mb-2">4. Data Security</h3>
+            <p className="mb-4 text-sm">
+              We implement appropriate technical and organizational measures to protect your personal information
+              against unauthorized or unlawful processing, accidental loss, destruction, or damage. However, no method
+              of transmission over the Internet or electronic storage is 100% secure.
+            </p>
+
+            <h3 className="text-lg font-semibold mb-2">5. Data Retention</h3>
+            <p className="mb-4 text-sm">
+              We retain your personal information for as long as necessary to fulfill the purposes for which we
+              collected it, including for the purposes of satisfying any legal, accounting, or reporting requirements.
+            </p>
+
+            <h3 className="text-lg font-semibold mb-2">6. Your Rights</h3>
+            <p className="mb-2 text-sm">
+              Depending on your location, you may have certain rights regarding your personal information, including:
+            </p>
+            <ul className="list-disc pl-5 mb-4 space-y-1 text-sm">
+              <li>The right to access your personal information</li>
+              <li>The right to rectify inaccurate personal information</li>
+              <li>The right to request deletion of your personal information</li>
+              <li>The right to restrict or object to processing of your personal information</li>
+              <li>The right to data portability</li>
+            </ul>
+
+            <h3 className="text-lg font-semibold mb-2">7. Changes to Our Privacy Policy</h3>
+            <p className="mb-4 text-sm">
+              We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new
+              Privacy Policy on this page and updating the "Last Updated" date.
+            </p>
+          </div>
+          <DialogFooter>
+            <Button onClick={() => setPrivacyDialogOpen(false)}>Close</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
